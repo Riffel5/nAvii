@@ -4,7 +4,7 @@ import cv2
 import matplotlib.cm as cm
 import torch
 
-from models.matching import Matching
+from models.super_glue.matching import Matching
 from models.utils import (AverageTimer, VideoStreamer,
                           make_matching_plot_fast, frame2tensor)
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         '--superglue', choices={'indoor', 'outdoor'}, default='indoor',
         help='SuperGlue weights')
     parser.add_argument(
-        '--max_keypoints', type=int, default=-1,
+        '--max_keypoints', type=int, default=1024,
         help='Maximum number of keypoints detected by Superpoint'
              ' (\'-1\' keeps all keypoints)')
     parser.add_argument(
