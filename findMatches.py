@@ -4,7 +4,7 @@ import cv2
 import matplotlib.cm as cm
 import torch
 
-from models.super_glue.matching import Matching
+from models.matching import Matching
 from models.utils import (AverageTimer, VideoStreamer,
                           make_matching_plot_fast, frame2tensor)
 
