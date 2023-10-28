@@ -16,7 +16,7 @@ if __name__ == '__main__':
         description='SuperGlue demo',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '--input', type=str, default='0',
+        '--input', type=str, default='./ref/',
         help='ID of a USB webcam, URL of an IP camera, '
              'or path to an image directory or movie file')
     parser.add_argument(
@@ -24,7 +24,7 @@ if __name__ == '__main__':
         help='Directory where to write output frames (If None, no output)')
 
     parser.add_argument(
-        '--image_glob', type=str, nargs='+', default=['*.png', '*.jpg', '*.jpeg'],
+        '--image_glob', type=str, nargs='+', default=['*.png', '*.jpg', '*.jpeg', '*.JPG'],
         help='Glob if a directory of images is specified')
     parser.add_argument(
         '--skip', type=int, default=1,
@@ -100,8 +100,7 @@ if __name__ == '__main__':
     }
     matching = Matching(config).eval().to(device)
     keys = ['keypoints', 'scores', 'descriptors']
-
-    vs = VideoStreamer(opt.input, opt.resize, opt.skip,
+    vs = VideoStreamer("./input/", opt.resize, opt.skip,
                        opt.image_glob, opt.max_length)
     frame, ret = vs.next_frame()
     assert ret, 'Error when reading the first frame (try different --input?)'
@@ -133,8 +132,12 @@ if __name__ == '__main__':
           '\tq: quit')
 
     timer = AverageTimer()
-
+    vs = VideoStreamer("./ref/", opt.resize, opt.skip,
+                       opt.image_glob, opt.max_length)
+    ref_maps = list(Path("./ref/").glob("*.JPG"))
+    i = 0
     while True:
+
         frame, ret = vs.next_frame()
         if not ret:
             print('Finished demo_superglue.py')
@@ -153,6 +156,7 @@ if __name__ == '__main__':
         valid = matches > -1
         mkpts0 = kpts0[valid]
         mkpts1 = kpts1[matches[valid]]
+        print(vs.listing[stem1], len(mkpts0))
         color = cm.jet(confidence[valid])
         text = [
             'SuperGlue',
