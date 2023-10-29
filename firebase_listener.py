@@ -2,7 +2,7 @@ import firebase_admin
 import requests
 import torch
 from firebase_admin import credentials, db
-
+from datetime import datetime
 from find_location_from_saved_kpnts import process_image
 from models.matching import Matching
 
@@ -44,8 +44,10 @@ def listener(event):
     f = open('./input/img.jpg', 'wb')
     f.write(data)
     f.close()
-
-    process_image(matching, device)
+    firebase_admin.db.reference('startProcessingTimestamp').set(f"{datetime.now()}")
+    best_class = process_image(matching, device)
+    firebase_admin.db.reference('location').set(best_class)
+    firebase_admin.db.reference('locationSetTimestamp').set(f"{datetime.now()}")
 
 
 firebase_admin.db.reference('image').listen(listener)

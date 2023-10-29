@@ -34,18 +34,50 @@ def process_image(matching, device):
     with open("ref_kpnts.pkl", 'rb') as handle:
         ref_kpnts = pickle.load(handle)
 
+    most_keypoints = 0
+    best_class = "Error Finding Location!"
     for test in ref_kpnts:
-       # frame_tensor = frame2tensor(frame, device)
+        # frame_tensor = frame2tensor(frame, device)
         pred = matching({**last_data, **test})
         kpts0 = last_data['keypoints0'][0].cpu().numpy()
         matches = pred['matches0'][0].cpu().numpy()
-       # confidence = pred['matching_scores0'][0].cpu().numpy()
+        # confidence = pred['matching_scores0'][0].cpu().numpy()
         timer.update('forward')
 
         valid = matches > -1
         mkpts0 = kpts0[valid]
-        print(test["name"], len(mkpts0))
+        print(test["class"], len(mkpts0))
+
+        if len(mkpts0) > most_keypoints:
+            most_keypoints = len(mkpts0)
+            best_class = test["class"]
+
+    return best_class
 
 
 if __name__ == "__main__":
-    process_image()
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print('Running inference on device \"{}\"'.format(device))
+
+    nms_radius = 4
+    keypoint_threshold = 0.005
+    max_keypoints = 1024
+    superglue = 'indoor'
+    sinkhorn_iterations = 20
+    match_threshold = 0.2
+
+    config = {
+        'superpoint': {
+            'nms_radius': nms_radius,
+            'keypoint_threshold': keypoint_threshold,
+            'max_keypoints': max_keypoints
+        },
+        'superglue': {
+            'weights': superglue,
+            'sinkhorn_iterations': sinkhorn_iterations,
+            'match_threshold': match_threshold,
+        }
+    }
+
+    matching = Matching(config).eval().to(device)
+    process_image(matching, device)

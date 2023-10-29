@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import argparse
 import cv2
@@ -8,6 +9,8 @@ import pickle
 from models.matching import Matching
 from models.utils import (AverageTimer, VideoStreamer,
                           make_matching_plot_fast, frame2tensor)
+
+from glob import glob
 
 torch.set_grad_enabled(False)
 
@@ -52,21 +55,26 @@ last_frame = frame
 last_image_id = 0
 
 timer = AverageTimer()
-vs = VideoStreamer("./ref/", resize, skip, image_glob, max_length)
 
 ref_maps = list(Path("./ref/").glob("*.JPG"))
 i = 0
-while True:
-    frame, ret = vs.next_frame()
-    if not ret:
-        break
-    frame_tensor = frame2tensor(frame, device)
-    last_data = matching.superpoint({'image': frame_tensor})
-    last_data = {k + '1': last_data[k] for k in keys}
-    last_data['image1'] = frame_tensor
-    last_data['name'] = str(ref_maps[i])
-    all_data.append(last_data)
-    i += 1
+
+classes = os.listdir("./ref/")
+
+for class_name in classes:
+    vs = VideoStreamer(f"./ref/{class_name}/", resize, skip, image_glob, max_length)
+    while True:
+        frame, ret = vs.next_frame()
+        if not ret:
+            break
+        frame_tensor = frame2tensor(frame, device)
+        last_data = matching.superpoint({'image': frame_tensor})
+        last_data = {k + '1': last_data[k] for k in keys}
+        last_data['image1'] = frame_tensor
+        # last_data['name'] = str(ref_maps[i])
+        last_data['class'] = class_name
+        all_data.append(last_data)
+        i += 1
 
 with open("ref_kpnts.pkl", 'wb') as output:
     pickle.dump(all_data, output, pickle.HIGHEST_PROTOCOL)
