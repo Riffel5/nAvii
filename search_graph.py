@@ -147,6 +147,7 @@ def get_shortest_path_text(origin_string, destination_string):
     if not use_stairs:
         G.add_edge(29, 40, weight=40)
     G.add_edge(28, 41, weight=40)
+    G.add_edge(7, 28, weight=79)
 
     # Basement
     G.add_edge(40, 41, weight=27)
@@ -173,9 +174,10 @@ def get_shortest_path_text(origin_string, destination_string):
 
     stupid_solution_to_my_problem = [[3, 10], [8, 12], [4, 11], [7, 13], [25, 10], [27, 12], [29, 14], [11, 26],
                                      [13, 28], [29, 40], [28, 41], [10, 3], [12, 8], [11, 4], [13, 7], [10, 25],
-                                     [12, 27], [14, 29], [26, 11], [28, 13], [40, 29], [41, 28]]
+                                     [12, 27], [14, 29], [26, 11], [28, 13], [40, 29], [41, 28], [7, 28], [28, 7]]
     i = 0
     walk = 0
+    ele_skips = 0
     # instruction_list = []
     info_string = f"You are currently at {edge_labels[shortest_path[i]]}"
     print(info_string)
@@ -188,26 +190,27 @@ def get_shortest_path_text(origin_string, destination_string):
         if i != len(shortest_path) - 1 and any(
                 x in [[shortest_path[i], shortest_path[i + 1]]] for x in stupid_solution_to_my_problem):
             next_loc = edge_labels[shortest_path[i + 1]]
-            info_string += f"\n\n{i}. Take the {current_loc} to the {next_loc}."
+            info_string += f"\n\n{i - ele_skips}. Take the {current_loc} to the {next_loc}."
+            ele_skips += 1
             print(info_string)
             # instruction_list.append(info_string)
             walk = -1
         elif i == len(shortest_path) - 1:
-            info_string += f"\n\n{i}. Continue forward until you reach your destination, {current_loc}"
+            info_string += f"\n\n{i - ele_skips}. Continue forward until you reach your destination, {current_loc}"
             print(info_string)
             # instruction_list.append(info_string)
         elif walk == 0:
-            info_string += f"\n\n{i}. Walk to {current_loc}"
+            info_string += f"\n\n{i - ele_skips}. Walk to {current_loc}"
             print(info_string)
             # instruction_list.append(info_string)
             walk += 1
         elif walk == 1:
-            info_string += f"\n\n{i}. Continue past {current_loc}"
+            info_string += f"\n\n{i - ele_skips}. Continue past {current_loc}"
             print(info_string)
             # instruction_list.append(info_string)
             walk += 1
         elif walk == 2:
-            info_string += f"\n\n{i}. Walk past {current_loc}"
+            info_string += f"\n\n{i - ele_skips}. Walk past {current_loc}"
             print(info_string)
             # instruction_list.append(info_string)
             walk = 1

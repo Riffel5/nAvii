@@ -172,11 +172,7 @@ if __name__ == '__main__':
             ]
             k_thresh = matching.superpoint.config['keypoint_threshold']
             m_thresh = matching.superglue.config['match_threshold']
-            small_text = [
-                'Keypoint Threshold: {:.4f}'.format(k_thresh),
-                'Match Threshold: {:.2f}'.format(m_thresh),
-                'Image Pair: {:06}:{:06}'.format(stem0, stem1),
-            ]
+            small_text = []
             out = make_matching_plot_fast(
                 last_frame, frame, kpts0, kpts1, mkpts0, mkpts1, color, text,
                 path=None, show_keypoints=opt.show_keypoints, small_text=small_text)
