@@ -1,7 +1,7 @@
 import firebase_admin
+import requests
 import torch
-from firebase_admin import credentials
-from firebase_admin import db
+from firebase_admin import credentials, db
 
 from find_location_from_saved_kpnts import process_image
 from models.matching import Matching
@@ -39,7 +39,12 @@ firebase_admin.initialize_app(cred, {'databaseURL': 'https://navii-fc6c9-default
 
 
 def listener(event):
-    print(event.data)  # new data at /reference/event.path. None if deleted
+    image_url = event.data  # new data at /reference/event.path. None if deleted
+    data = requests.get(image_url).content
+    f = open('./input/img.jpg', 'wb')
+    f.write(data)
+    f.close()
+
     process_image(matching, device)
 
 

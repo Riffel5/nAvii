@@ -30,9 +30,6 @@ def process_image(matching, device):
     last_data['image0'] = frame_tensor
 
     timer = AverageTimer()
-    vs = VideoStreamer("./ref/", resize, skip, image_glob, max_length)
-
-    ref_maps = list(Path("./ref/").glob("*.JPG"))
 
     with open("ref_kpnts.pkl", 'rb') as handle:
         ref_kpnts = pickle.load(handle)
