@@ -8,7 +8,6 @@ from models.matching import Matching
 
 torch.set_grad_enabled(False)
 
-
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('Running inference on device \"{}\"'.format(device))
 
